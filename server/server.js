@@ -1,21 +1,29 @@
 require('./config/config');
-
 const path = require('path');
+
+const http = require('http');
+const express = require('express');
+const socketIO = require('socket.io');
 
 const publicPath = path.join(__dirname, '../public');
 
-const express = require('express');
-
 const app = express();
 const port = process.env.PORT;
+
+let server = http.createServer(app);
+let io = socketIO(server);
+
 app.use(express.static(publicPath));
 
-app.get('/', (req, res) => {
+io.on('connection', (socket) => {
+    console.log('New user connected');
 
-    res.send('Hello chat app');
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log('Started on port 3000')
 });
 
